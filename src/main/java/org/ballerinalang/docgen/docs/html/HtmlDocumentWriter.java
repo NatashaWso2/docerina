@@ -39,6 +39,8 @@ import org.wso2.ballerinalang.compiler.tree.BLangEnum;
 import org.wso2.ballerinalang.compiler.tree.BLangFunction;
 import org.wso2.ballerinalang.compiler.tree.BLangIdentifier;
 import org.wso2.ballerinalang.compiler.tree.BLangPackage;
+import org.wso2.ballerinalang.compiler.tree.BLangResource;
+import org.wso2.ballerinalang.compiler.tree.BLangService;
 import org.wso2.ballerinalang.compiler.tree.BLangStruct;
 import org.wso2.ballerinalang.compiler.tree.BLangVariable;
 import org.wso2.ballerinalang.compiler.tree.types.BLangType;
@@ -136,6 +138,14 @@ public class HtmlDocumentWriter implements DocumentWriter {
                                                                                     a -> a.getName().getValue())));
             }
 
+            // Sort resources in services
+            if ((balPackage.getServices() != null) && (balPackage.getServices().size() > 0)) {
+                balPackage.getServices().forEach(service ->
+                        Collections.sort(service.getResources(),
+                                Comparator.comparing(
+                                        a -> a.getName().getValue())));
+            }
+
             String filePath = outputFilePath + File.separator + refinePackagePath(balPackage) + HTML;
             writeHtmlDocument(balPackage, packageTemplateName, filePath);
         }
@@ -214,6 +224,9 @@ public class HtmlDocumentWriter implements DocumentWriter {
                             }
                         }
                         return options.inverse(null);
+                    })
+                    .registerHelper("hasServices", (Helper<BLangPackage>) (balPackage, options) -> {
+                        return options.fn(balPackage);
                     })
                     .registerHelper("isPublic", (Helper<AnnotatableNode>) (annotatableNode, options) -> {
                         if (annotatableNode.getFlags().contains(Flag.PUBLIC)) {
@@ -514,6 +527,14 @@ public class HtmlDocumentWriter implements DocumentWriter {
             BLangEnum enumNode = (BLangEnum) dataHolder.getCurrentObject();
             currentPkgPath = enumNode.symbol.pkgID.name.value; //getPackagePath(enum);
             return enumNode.getAnnotationAttachments();
+        } else if (dataHolder.getCurrentObject() instanceof BLangService) {
+            BLangService service = (BLangService) dataHolder.getCurrentObject();
+            currentPkgPath = service.symbol.pkgID.name.value; //getPackagePath(service);
+            return service.getAnnotationAttachments();
+        } else if (dataHolder.getCurrentObject() instanceof BLangResource) {
+            BLangResource resource = (BLangResource) dataHolder.getCurrentObject();
+            currentPkgPath = resource.symbol.pkgID.name.value; //getPackagePath(resource);
+            return resource.getAnnotationAttachments();
         } else {
             return new ArrayList<>();
         }

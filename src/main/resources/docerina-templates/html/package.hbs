@@ -241,6 +241,48 @@
                         {{/each}}
                         <p></p>
                         <br>{{/hasAnnotations}}
+                        {{#hasServices}}
+                            <!-- Services -->
+                            <h2>Services of {{refinePackagePath this}} package</h2>
+                            {{#each services}} {{currentObject this}}
+                                    <h3 id="{{name}}">
+                                        service {{#with this}}{{this.name}}{{/with}}
+                                    </h3>
+                                    <p>{{oneValueAnnotation "description"}}</p>
+                                    <b>Resources:</b><br><br> {{#each resources}} {{currentObject this}}
+                                    <h3 id="{{name}}{{../name}}">resource {{this.name}}({{#each parameters}}<a href="{{#bindLink typeKind}}{{/bindLink}}"{{typeTitle typeKind}}>{{typeText this}}</a> {{name}}{{#unless @last}}, {{/unless}}{{/each}})</h3>
+                                    <p>{{oneValueAnnotation "description"}}</p>
+                                    {{#if parameters}}
+                                        <p>
+                                            <b>Parameters:</b>
+                                        <table>
+                                            <tr>
+                                                <th>Parameter Name</th><th>Data Type</th><th>Description</th>
+                                            </tr>
+                                            {{#each parameters}}
+                                                <tr>
+                                                    <td>{{name}}</td><td><a href="{{#bindLink typeKind}}{{/bindLink}}"{{typeTitle typeKind}}>{{typeText this}}</a></td><td>{{paramAnnotation this "param"}}</td>
+                                                </tr>
+                                            {{/each}}
+                                        </table>
+                                        </p>
+                                    {{/if}}
+                                    {{#if returnParameters}}
+                                        <p>
+                                            <b>Return Parameters:</b>
+                                        <table>
+                                            <tr>
+                                                <th>Return Variable</th><th>Data Type</th><th>Description</th>
+                                            </tr>
+                                            {{#each returnParameters}}
+                                                <tr>
+                                                    <td>{{name}}</td><td><a href="{{#bindLink typeKind}}{{/bindLink}}"{{typeTitle typeKind}}>{{typeText this}}</a></td><td>{{paramAnnotation this "return"}}</td>
+                                                </tr>
+                                            {{/each}}
+                                        </table>
+                                        </p>
+                                    {{/if}} {{/each}} {{/each}}
+                            <br>{{/hasServices}}
                         </div>
                 </section>
             </div>
@@ -315,7 +357,20 @@
                                     <li><a href="#{{name}} ">{{name}}</a></li>
                                 {{/each}}
                             </ul>
-                        </li>{{/hasAnnotations}}
+                        </li>{{/hasAnnotations}}{{#hasServices}}
+                        <li>
+                            <span class="opener">Services</span>
+                            <ul>
+                                {{#each services}}
+                                    <li><a href="#{{this.name}} ">{{#with this}}{{this.name}}{{/with}}</a>
+                                        <ul>
+                                            {{#each resources}}
+                                                <li><a href="#{{name}}{{../name}}">{{this.name}}({{#each parameters}}{{typeText this}} {{name}}{{#unless @last}}, {{/unless}}{{/each}})</a></li>
+                                            {{/each}}
+                                        </ul>
+                                    </li>{{/each}}
+                            </ul>
+                        </li>{{/hasServices}}
                     </ul>
                 </nav>
 
